@@ -1,6 +1,8 @@
 package cs4620.anim;
 
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 import cs4620.common.Scene;
 import cs4620.common.SceneObject;
@@ -148,10 +150,33 @@ public class AnimationEngine {
 	// TODO A6 - Animation
 
 	 public void updateTransformations() {
-		// Loop Through All The Timelines
-		// And Update Transformations Accordingly
-		// (You WILL Need To Use this.scene)
-
+		 // Loop Through All The Timelines
+		 // And Update Transformations Accordingly
+		 // (You WILL Need To Use this.scene)
+		 Iterator it = this.timelines.entrySet().iterator();
+		 while (it.hasNext()) {
+			 Map.Entry pair = (Map.Entry)it.next();
+			 AnimTimeline timeline = (AnimTimeline) (pair.getValue());
+			 AnimKeyframe[] outPair = new AnimKeyframe[2];
+			 timeline.getSurroundingFrames(curFrame, outPair);
+			 float ratio = getRatio(outPair[0].frame, outPair[1].frame, curFrame);
+			 
+			 Vector3 prevT = outPair[0].transformation.getTrans();
+			 Vector3 nextT = outPair[1].transformation.getTrans();
+			 
+			 Matrix3 prevR = new Matrix3();
+			 Matrix3 prevS = new Matrix3();
+			 outPair[0].transformation.getAxes().polar_decomp(prevR, prevS);
+			 
+			 Matrix3 nextR = new Matrix3();
+			 Matrix3 nextS = new Matrix3();
+			 outPair[1].transformation.getAxes().polar_decomp(nextR, nextS);
+			 //System.out.println(pair.getKey() + " = " + pair.getValue());
+			 it.remove(); // avoids a ConcurrentModificationException
+			 
+		 }
+		 
+			 
 		// get pair of surrounding frames
 		// (function in AnimTimeline)
 
