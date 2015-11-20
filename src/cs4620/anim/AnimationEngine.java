@@ -171,8 +171,57 @@ public class AnimationEngine {
 			 Matrix3 nextR = new Matrix3();
 			 Matrix3 nextS = new Matrix3();
 			 outPair[1].transformation.getAxes().polar_decomp(nextR, nextS);
+			 
+			 Vector3 interT = new Vector3();
+			 interT.set(prevT.clone().mul(1-ratio));
+			 interT.add(nextT.clone().mul(ratio));
+			 
+			 
+			 Quat prevQuat = new Quat(prevR);
+			 Quat nextQuat = new Quat(nextR);			 
+			 Quat interQuat = new Quat();
+			 interQuat = Quat.slerp(prevQuat, nextQuat, ratio);
+			 Matrix3 interR = new Matrix3();
+			 interQuat.toRotationMatrix(interR);
+			 
+			 Matrix3 interS = new Matrix3();
+			 Matrix3 preScale = new Matrix3(1-ratio,0,0,
+					                        0, 1-ratio, 0,
+					                        0, 0, 1-ratio);
+			 
+			 Matrix3 nextScale = new Matrix3(ratio,0,0,
+                                             0, ratio, 0,
+                                             0, 0, ratio); 
+			 
+			 interS.set(prevS.clone().mulAfter(preScale));
+			 interS.add(nextS.clone().mulAfter(nextScale));
+			 
+			 Matrix3 combineRS = new Matrix3();
+			 combineRS.set(interR);
+			 combineRS.mulBefore(interS);
+			 Matrix4 interpolate = new Matrix4();
+			 
+			 interpolate.set(combineRS.get(0, 0), combineRS.get(0, 1), combineRS.get(0, 2), interT.x, 
+					 combineRS.get(1, 0), combineRS.get(1, 1), combineRS.get(1, 2), interT.y, 
+					 combineRS.get(2, 0), combineRS.get(2, 1), combineRS.get(2, 2), interT.z, 
+					 0, 0, 0, 1);
+//			 interpolate.set(1, 0, 0, interT.x, 
+//					 0, 1, 0, interT.y, 
+//					 0, 0, 1, interT.z, 
+//					 0, 0, 0, 1);
+			 System.out.println("preScale"+preScale);
+			 System.out.println("nextScale"+nextScale);
+			 System.out.println("preS"+prevS);
+			 System.out.println("nextS"+nextS);
+			 System.out.println("interS"+interS);
+			 timeline.object.transformation.set(interpolate);
+			 scene.sendEvent(new SceneTransformationEvent(timeline.object));
+			 
+			 
+			 
+			 
 			 //System.out.println(pair.getKey() + " = " + pair.getValue());
-			 it.remove(); // avoids a ConcurrentModificationException
+			 //it.remove(); // avoids a ConcurrentModificationException
 			 
 		 }
 		 

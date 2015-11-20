@@ -10,6 +10,8 @@ import cs4620.common.SceneCamera;
 import cs4620.common.SceneLight;
 import cs4620.common.SceneObject;
 import cs4620.common.Texture;
+import egl.math.Matrix3;
+import egl.math.Matrix4;
 import egl.math.Vector2;
 
 /**
@@ -119,8 +121,34 @@ public class RenderTreeBuilder {
 	 * @param env  The environment containing the hierarchy to be processed.
 	 */
 	public static void rippleTransformations(RenderEnvironment env) {
-		// TODO#A3 SOLUTION START
+		
+		RenderTreeBuilder treeBuilder = new RenderTreeBuilder();
+		treeBuilder.traverse(env.root);
+		for (RenderCamera camera: env.cameras) {
+			camera.updateCameraMatrix(env.viewportSize);
 		}
+	}
+	
+	private void traverse(RenderObject node) {
+		if (node == null) return;
+		if (node.parent != null) {
+			Matrix4 parentTransform = node.parent.mWorldTransform; //A
+			Matrix4 localTransform = node.sceneObject.transformation; //B
+			
+			
+			Matrix4 mWorldTransform = new Matrix4(); //A
+			
+			mWorldTransform.set(parentTransform);
+			mWorldTransform.mulBefore(localTransform);
+			node.mWorldTransform.set(mWorldTransform);
+			
+			node.mWorldTransformIT.set(new Matrix3(mWorldTransform).invert().transpose());	
+		}
+		
+		for (RenderObject child: node.children) {
+			traverse(child);
+		}
+	}
 	// SOLUTION END
 	
 	/**

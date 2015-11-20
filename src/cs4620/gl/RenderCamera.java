@@ -55,7 +55,31 @@ public class RenderCamera extends RenderObject {
 		// The camera's transformation matrix is found in this.mWorldTransform (inherited from RenderObject).
 		// The other camera parameters are found in the scene camera (this.sceneCamera).
 		// Look through the methods in Matrix4 before you type in any matrices from the book or the OpenGL specification.
+		double f = this.sceneCamera.zPlanes.y;
+		double n = this.sceneCamera.zPlanes.x;
 		
+		float nX = viewportSize.x;
+		float nY = viewportSize.y;
+		
+		if (this.sceneCamera.isPerspective) {
+			Matrix4.createPerspective(
+					(float) this.sceneCamera.imageSize.x * (nX/nY), 
+					(float) this.sceneCamera.imageSize.y, 
+					(float) n, (float) f, this.mProj);
+		} else {
+			Matrix4.createOrthographic(
+					(float) this.sceneCamera.imageSize.x * (nX/nX), 
+					(float) this.sceneCamera.imageSize.y, 
+					(float) n, (float) f, this.mProj);
+		}
+		
+		this.mView.set(this.mWorldTransform);
+		this.mView.invert();
+		
+		
+		
+		this.mViewProjection.set(this.mProj);
+		this.mViewProjection.mulBefore(this.mView);
 		// TODO#A3 SOLUTION START
 
 		// Create viewing matrix
