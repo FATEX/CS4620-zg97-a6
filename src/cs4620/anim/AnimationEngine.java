@@ -205,21 +205,11 @@ public class AnimationEngine {
 					 combineRS.get(1, 0), combineRS.get(1, 1), combineRS.get(1, 2), interT.y, 
 					 combineRS.get(2, 0), combineRS.get(2, 1), combineRS.get(2, 2), interT.z, 
 					 0, 0, 0, 1);
-//			 interpolate.set(1, 0, 0, interT.x, 
-//					 0, 1, 0, interT.y, 
-//					 0, 0, 1, interT.z, 
-//					 0, 0, 0, 1);
-			 System.out.println("preScale"+preScale);
-			 System.out.println("nextScale"+nextScale);
-			 System.out.println("preS"+prevS);
-			 System.out.println("nextS"+nextS);
-			 System.out.println("interS"+interS);
+
 			 timeline.object.transformation.set(interpolate);
 			 scene.sendEvent(new SceneTransformationEvent(timeline.object));
 			 
-			 
-			 
-			 
+			
 			 //System.out.println(pair.getKey() + " = " + pair.getValue());
 			 //it.remove(); // avoids a ConcurrentModificationException
 			 

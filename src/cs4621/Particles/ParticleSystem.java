@@ -2,6 +2,7 @@ package cs4621.Particles;
 
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
+import java.util.Iterator;
 import java.util.LinkedList;
 
 import cs4620.mesh.MeshData;
@@ -116,7 +117,16 @@ public class ParticleSystem {
         //     elapsed since the last particle has spawned, spawn another if you can.
         //     This spawned particle should have some random initial velocity upward in the +y 
         //     direction and its position should be (0, -0.5, 0).
+    	float time = (float)0.2;
+    	float mass = (float) 1;
     	this.mTimeSinceLastSpawn += dt;
+    	if(this.mTimeSinceLastSpawn >= time && this.mUnspawnedParticles.size() > 0) {
+    		this.mTimeSinceLastSpawn = 0;
+    		Particle particle = this.mUnspawnedParticles.poll();
+    		particle.spawn(mass, new Vector3((float)0.0, (float)-0.5, (float)0.0), new Vector3((float)0.0, (float)Math.random()*2 + 3, (float)0.0));
+    		this.mSpawnedParticles.add(particle);
+    	}
+    	
         // 3.) Remove the particle from the linked list of unspawned particles and put it
         //     onto the linked list of spawned particles.
         // 4.) For each spawned particle:
@@ -128,6 +138,22 @@ public class ParticleSystem {
         //            linked list of spawned particles and append it to the linked list of
         //            unspawned particles.
         
+        Iterator<Particle> it = this.mSpawnedParticles.iterator();
+        while(it.hasNext()){
+        	Particle p = it.next();
+        	p.resetForces();
+        	Vector3 force = new Vector3(this.wind, -this.gravity*mass, 0);	
+        	//p.accumForce(force);
+        	Vector3 dragForce = p.getVelocity().clone().mul(-this.drag);
+        	force.add(dragForce);
+        	p.accumForce(force);
+        	System.out.println(dragForce);
+        	p.animate(dt);
+        	if(p.getAge() > 5){
+        		this.mUnspawnedParticles.add(p);
+        		it.remove();
+        	}
+        }
         
         //ENDSOLUTION
     }
@@ -141,7 +167,15 @@ public class ParticleSystem {
         // the particle is always facing the camera.
         // 1.) Obtain the inverse of the rotation of the camera.
         // 2.) Set billboardTransform.
-        
+    	
+    	Matrix4 rotation = new Matrix4(view.clone().invert());
+    	Vector3 trans = rotation.getTrans();
+    	///trans.invert();
+    	rotation.set(0, 3, rotation.get(0, 3)-trans.x);
+    	rotation.set(1, 3, rotation.get(1, 3)-trans.y);
+    	rotation.set(2, 3, rotation.get(2, 3)-trans.z);
+    	this.billboardTransform.set(rotation);
+    	
         // SOLUTION END
     }
     
