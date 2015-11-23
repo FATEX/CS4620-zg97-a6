@@ -111,10 +111,12 @@ public class ParticleSystem {
         // TODO#PPA3 SOLUTION START
         // Animate the particle system:
         // 1.) If the particle system is paused, return immediately.
+    	if (this.mPaused) return;
         // 2.) Update the time since last spawn, and if a sufficient amount of time has
         //     elapsed since the last particle has spawned, spawn another if you can.
         //     This spawned particle should have some random initial velocity upward in the +y 
         //     direction and its position should be (0, -0.5, 0).
+    	this.mTimeSinceLastSpawn += dt;
         // 3.) Remove the particle from the linked list of unspawned particles and put it
         //     onto the linked list of spawned particles.
         // 4.) For each spawned particle:
