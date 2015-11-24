@@ -386,6 +386,7 @@ public final class ParticleScreen extends GameScreen{
         GL11.glEnable(GL11.GL_ALPHA_TEST);
         GL11.glAlphaFunc(GL11.GL_GREATER, 0.6f);
         
+        
         for(Particle p : mParticleSystem.mSpawnedParticles) {
             vBuf.rewind(); vBufWireframe.rewind();
             
@@ -470,7 +471,29 @@ public final class ParticleScreen extends GameScreen{
                 //     appropriate index buffer (ibVelocities).
                 // 5.) Bind the GLBuffer to the appropriate shader interface (linesSI) and draw
                 //     the velocity lines.
-                
+            	GL11.glDisable(GL11.GL_DEPTH_TEST);
+            	vBufVelocities.put(p.getParticlePosition().x);
+            	vBufVelocities.put(p.getParticlePosition().y);
+            	vBufVelocities.put(p.getParticlePosition().z);
+            	Vector3 v = p.getParticlePosition().clone().add(p.getVelocity().clone().mul((float)0.05));
+            	vBufVelocities.put(v.x);
+            	vBufVelocities.put(v.y);
+            	vBufVelocities.put(v.z);
+            	vBufVelocities.rewind();
+                velocityVerts.setDataInitial(vBufVelocities);
+                linesProgram.use();
+                {
+                    // Pass over view projection matrix.
+                    GLUniform.setST(linesProgram.getUniform("mModelViewProjection"), mViewProjection, false);
+
+                    velocityVerts.useAsAttrib(linesSI);
+                    
+                    ibVelocities.bind();
+                    GL11.glDrawElements(PrimitiveType.Lines, 8, GLType.UnsignedInt, 0);
+                    ibVelocities.unbind();
+                }
+                GLProgram.unuse();
+                GL11.glEnable(GL11.GL_DEPTH_TEST);
                 // SOLUTION END
             }
         }

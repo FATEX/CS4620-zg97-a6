@@ -117,13 +117,13 @@ public class ParticleSystem {
         //     elapsed since the last particle has spawned, spawn another if you can.
         //     This spawned particle should have some random initial velocity upward in the +y 
         //     direction and its position should be (0, -0.5, 0).
-    	float time = (float)0.2;
+    	float time = (float)0.05;
     	float mass = (float) 1;
     	this.mTimeSinceLastSpawn += dt;
     	if(this.mTimeSinceLastSpawn >= time && this.mUnspawnedParticles.size() > 0) {
     		this.mTimeSinceLastSpawn = 0;
     		Particle particle = this.mUnspawnedParticles.poll();
-    		particle.spawn(mass, new Vector3((float)0.0, (float)-0.5, (float)0.0), new Vector3((float)0.0, (float)Math.random()*2 + 3, (float)0.0));
+    		particle.spawn(mass, new Vector3((float)0.0, (float)-0.5, (float)0.0), new Vector3((float)Math.random()*4 -2, (float)Math.random()*2 + 3, (float)Math.random()*4 - 2));
     		this.mSpawnedParticles.add(particle);
     	}
     	
@@ -147,7 +147,6 @@ public class ParticleSystem {
         	Vector3 dragForce = p.getVelocity().clone().mul(-this.drag);
         	force.add(dragForce);
         	p.accumForce(force);
-        	System.out.println(dragForce);
         	p.animate(dt);
         	if(p.getAge() > 5){
         		this.mUnspawnedParticles.add(p);
